@@ -257,6 +257,8 @@ h3.first{margin-top:0}
 .nlbl.hide{display:none}
 :root{--nb:#F1EFE9}
 @media (prefers-color-scheme:dark){:root{--nb:#2B3D44}}
+@media (hover:none){.opt:hover{border-color:var(--line)}.opt.right:hover{border-color:var(--done)}.opt.wrong:hover{border-color:var(--warn)}.opt.on:hover{border-color:var(--accent)}}
+.kopts .opt:focus{outline:none}
 </style>
 </head>
 <body>
@@ -629,7 +631,7 @@ const KT={
  whereIs:["Where is this?","Ini di mana?"],capOf:["Capital of {p}?","Ibu kota provinsi {p}?"],capWhich:["{c} is the capital of which province?","Kota {c} ibu kota provinsi mana?"],
  cityPhoto:["Which city is this photo from?","Foto ini dari kota mana?"],popQ:["What is the population of {p}?","Berapa penduduk provinsi {p}?"],
  areaQ:["Which is the largest?","Mana yang paling luas?"],foodQ:["Where is this dish from?","Makanan ini dari mana?"],
- histQ:["{y}: “{s}” Which province?","{y}: “{s}” Di provinsi mana?"],factQ:["Which province is this fact about?","Fakta ini tentang provinsi mana?"],histQ2:["Which province's history is this?","Ini sejarah provinsi mana?"],
+ histQ:["{y}: “{s}” Which province?","{y}: “{s}” Di provinsi mana?"],factQ:["Which province is this fact about?","Fakta ini tentang provinsi mana?"],kotaQ:["Which province is the city of {c} in?","Kota {c} ada di provinsi mana?"],histQ2:["Which province's history is this?","Ini sejarah provinsi mana?"],
  year:["Year","Tahun"],obj:["Object","Objek"],
 };
 const kt=(key,vars)=>{let s=tr(KT[key]);if(vars)for(const v in vars)s=s.replace("{"+v+"}",vars[v]);return s};
@@ -658,6 +660,7 @@ function leak(text,c){const {keys,eth}=qkeys(c);const lw=text.toLowerCase();retu
 /* ---- helpers ---- */
 const KCAT={temple:"cult",village:"cult",culture:"cult",volcano:"nat",mountain:"nat",forest:"nat",animal:"nat",canyon:"nat",cave:"nat",flower:"nat",terraces:"nat",lake:"water",beach:"water",island:"water",reef:"water",waterfall:"water",wave:"water"};
 const NOQ=new Set(["61-N1", "71-C1", "65-C1", "93-C1", "94-C1", "95-C1", "96-C1"]);
+const CITIES=[["Bekasi", "Bekasi", "32", 2644058], ["Depok", "Depok", "32", 2163635], ["Tangerang", "Tangerang", "36", 1963970], ["South Tangerang", "Tangerang Selatan", "36", 1399500], ["Batam", "Batam", "21", 1256610], ["Bogor", "Bogor", "32", 1078351], ["Malang", "Malang", "35", 872694], ["Tasikmalaya", "Tasikmalaya", "32", 750730], ["Balikpapan", "Balikpapan", "64", 738532], ["Banjarmasin", "Banjarmasin", "63", 675915], ["Cimahi", "Cimahi", "32", 598700], ["Surakarta", "Surakarta", "33", 589242], ["Cilegon", "Cilegon", "36", 455620], ["Sukabumi", "Sukabumi", "32", 365740], ["Cirebon", "Cirebon", "32", 344851], ["Dumai", "Dumai", "14", 338064], ["Pekalongan", "Pekalongan", "33", 318221], ["Binjai", "Binjai", "12", 303272], ["Kediri", "Kediri", "35", 298227], ["Pematangsiantar", "Pematangsiantar", "12", 274838], ["Tegal", "Tegal", "33", 294477], ["Tarakan", "Tarakan", "65", 249960], ["Probolinggo", "Probolinggo", "35", 249539], ["Singkawang", "Singkawang", "61", 246112], ["Lubuklinggau", "Lubuklinggau", "16", 246046], ["Padangsidimpuan", "Padangsidimpuan", "12", 236217], ["Bitung", "Bitung", "71", 232440], ["Batu", "Batu", "35", 222685], ["Pasuruan", "Pasuruan", "35", 219392], ["Ternate", "Ternate", "82", 204920], ["Madiun", "Madiun", "35", 201767], ["Salatiga", "Salatiga", "33", 198971], ["Prabumulih", "Prabumulih", "16", 203312], ["Lhokseumawe", "Lhokseumawe", "11", 196067], ["Langsa", "Langsa", "11", 194730], ["Bontang", "Bontang", "64", 189968], ["Tanjungbalai", "Tanjungbalai", "12", 183170], ["Tebing Tinggi", "Tebing Tinggi", "12", 178914], ["Metro", "Metro", "18", 175710], ["Palopo", "Palopo", "73", 177526], ["Bima", "Bima", "52", 161362], ["Baubau", "Baubau", "74", 161280], ["Parepare", "Parepare", "73", 160309], ["Blitar", "Blitar", "35", 154867], ["Pagar Alam", "Pagar Alam", "16", 149199], ["Payakumbuh", "Payakumbuh", "13", 144830], ["Gunungsitoli", "Gunungsitoli", "12", 142890], ["Mojokerto", "Mojokerto", "35", 137393], ["Bukittinggi", "Bukittinggi", "13", 124047], ["Kotamobagu", "Kotamobagu", "71", 123918], ["Magelang", "Magelang", "33", 128709], ["Tidore Islands", "Tidore Kepulauan", "82", 118613], ["Tomohon", "Tomohon", "71", 103072]];
 const QOK=new Set(["12-N1","12-N3","13-N1","13-N3","13-N4","14-N1","15-N2","17-N1","18-N1","19-N1","19-N2","31-N2","32-N1","32-N2","32-N4","33-N1","34-N2","34-N3","35-N1","35-N2","35-N3","51-N1","51-N2","51-N3","51-N4","51-N5","51-N6","51-N7","51-N8","52-N1","52-N2","53-N1","53-N2","53-N3","53-N4","53-N5","63-N1","71-N2","72-N2","73-N1","73-N2","74-N2","76-N1","81-N1","81-N2","82-N1","93-N1","93-N2","94-N1","96-N1"]
 );
 const FOODCAT={"Soto Betawi": "soup", "Tekwan": "soup", "Lempah kuning": "soup", "Mie lendir": "soup", "Rawon": "soup", "Soto Banjar": "soup", "Tinutuan": "soup", "Kaledo": "soup", "Coto Makassar": "soup", "Pallubasa": "soup", "Binte biluhuta": "soup", "Bau peapi": "soup", "Juhu singkah": "soup", "Garang asem": "soup", "Rabeg": "soup", "Gulai taboh": "soup", "Uta kelo": "soup", "Sinonggi": "soup", "Papeda": "soup", "Papeda with ikan kuah kuning": "soup", "Bubur pedas": "soup", "Jagung bose": "soup", "Gulai ikan patin": "soup", "Tempoyak": "soup", "Sate Padang": "satay", "Sate klathak": "satay", "Sate Madura": "satay", "Sate lilit": "satay", "Sate bandeng": "satay", "Bika Ambon": "sweet", "Bolu kemojo": "sweet", "Bakpia": "sweet", "Klappertaart": "sweet", "Es pisang ijo": "sweet", "Kue lontar": "sweet", "Kasoami": "sweet", "Nasi gemuk": "rice", "Nasi liwet": "rice", "Nasi kuning Samarinda": "rice", "Ketupat Kandangan": "rice", "Kerak telor": "rice", "Mie Aceh": "noodle", "Mie Belitung": "noodle", "Arsik": "fish", "Pempek": "fish", "Pendap": "fish", "Seruit": "fish", "Otak-otak": "fish", "Cakalang fufu": "fish", "Gohu ikan": "fish", "Ikan bakar": "fish", "Kohu-kohu": "fish", "Ilabulo": "fish", "Kepiting Tarakan": "fish", "Gonggong": "fish", "Udang selingkuh": "fish", "Rendang": "meat", "Dendeng balado": "meat", "Ayam tangkap": "meat", "Ayam betutu": "meat", "Ayam taliwang": "meat", "Babi guling": "meat", "Se'i": "meat", "Gudeg": "meat", "Dendeng rusa": "meat", "Bakar batu": "meat", "Sagu sep": "meat", "Karedok": "veg", "Rujak cingur": "veg", "Plecing kangkung": "veg", "Lemea": "veg", "Batagor": "veg", "Seblak": "veg", "Lumpia Semarang": "veg", "Choi pan": "veg", "Jepa": "staple", "Sagu lempeng": "staple", "Sagu bakar": "staple", "Ubi jalar": "staple", "Ulat sagu": "staple", "Amplang": "staple", "Kopi Gayo": "staple"};
@@ -713,6 +716,8 @@ const G={
    if(para)return {type:"hist",c,q:kt("histQ2"),quote:m,opts:opt4(PN2(c),ws),exp:`${PN2(c)}: ${s}`};
    const yy=/^\d{3,4}$/.test(y[0])?`${kt("year")} ${tr(y)}`:tr(y);
    return {type:"hist",c,q:kt("histQ",{y:yy,s:m}),opts:opt4(PN2(c),ws),exp:`${PN2(c)}: ${tr(y)}, ${tr(s)}`}},
+ kota(used){const cand=CITIES.filter(x=>!used.has(x[2]));if(!cand.length)return null;const [en,id,c,pop]=pick(cand);const nm=LANG==="id"?id:en;
+   return {type:"kota",c,q:kt("kotaQ",{c:nm}),opts:opt4(PN2(c),neigh(c,3).map(PN2)),exp:`${nm}: ${PN2(c)}, ${fmtM(pop)} ${t("people")} (BPS 2024)`}},
  fact(used){const cand=[];for(const c of CODES){if(used.has(c))continue;DATA.x[c].facts.forEach(f=>{const m=qmask(tr(f),c);if(maskOk(m))cand.push([c,f,m])})}
    if(!cand.length)return null;const [c,f,m]=pick(cand);const ws=safeWrong(tr(f),c,3);
    return {type:"fact",c,q:kt("factQ"),quote:m,opts:opt4(PN2(c),ws),exp:`${PN2(c)}: ${tr(f)}`}}
@@ -720,7 +725,7 @@ const G={
 const NQ=5;
 function makeCard(){
   for(let attempt=0;attempt<30;attempt++){
-    const used=new Set(),qs=[];const first=pick(["place","city"]);const order=[first,...shuffle(["place","cap","city","pop","area","food","hist","fact"].filter(x=>x!==first))];
+    const used=new Set(),qs=[];const first=pick(["place","city"]);const order=[first,...shuffle(["place","cap","city","kota","pop","area","food","hist","fact"].filter(x=>x!==first))];
     for(const ty of order){if(qs.length===NQ)break;if(qs.some(q=>q.type===ty))continue;if(ty==="food"&&qs.some(q=>q.type==="food"))continue;
       const q=G[ty](used,qs);if(!q)continue;
       if(qs.some(x=>x.obj&&q.obj&&x.obj===q.obj))continue;
