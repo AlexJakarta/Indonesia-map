@@ -259,6 +259,10 @@ h3.first{margin-top:0}
 @media (prefers-color-scheme:dark){:root{--nb:#2B3D44}}
 @media (hover:none){.opt:hover{border-color:var(--line)}.opt.right:hover{border-color:var(--done)}.opt.wrong:hover{border-color:var(--warn)}.opt.on:hover{border-color:var(--accent)}}
 .kopts .opt:focus{outline:none}
+.kpedas small{margin-left:6px;font-size:12px;color:var(--soft);font-weight:700}.kpd{font-size:14px;font-weight:700;margin-top:4px}
+.fbbtn{margin-left:auto}
+.fbmail{font-size:17px;font-weight:700;padding:12px;border-radius:12px;background:var(--chip);text-align:center;user-select:all;word-break:break-all}
+a.btn.fbopen{display:block;text-align:center;text-decoration:none;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -473,7 +477,7 @@ function paint(){
 
 /* ---------- card ---------- */
 const panel=$("#panel"), card=$("#card");
-function footer(){return `<div class="foot"><b>by AlexJakarta</b> · ${t("foot1")}<br>${t("foot2")} <a href="https://github.com/ardian28/GeoJson-Indonesia-38-Provinsi">GeoJson-Indonesia-38-Provinsi</a> by Ardian Saputra Hasibuan (MIT).</div>`}
+function footer(){return `<div class="foot"><b>by AlexJakarta</b> · <a href="#" onclick="feedback();return false">${ft("title")}</a> · ${t("foot1")}<br>${t("foot2")} <a href="https://github.com/ardian28/GeoJson-Indonesia-38-Provinsi">GeoJson-Indonesia-38-Provinsi</a> by Ardian Saputra Hasibuan (MIT).</div>`}
 function emptyCard(){card.innerHTML=`<div class="empty">${t("empty")}</div>${footer()}`}
 const ICO={
  pop:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c3 .2 5.5 2.4 5.5 5.8"/></svg>',
@@ -534,9 +538,10 @@ function openCard(c,keepScroll){
      <div class="chips"><span class="badge">${p.tz} · ${TZ[p.tz][0]}</span>${p.bord.length?`<span class="badge">${t("borders")} ${p.bord.map(tr).join(", ")}</span>`:""}${p.landlocked?`<span class="badge">${t("noCoastB")}</span>`:""}</div>
    </div>
    <div class="cbody" style="--gc:var(${GCOL[p.group]})">${body}${footer()}</div>
-   <div class="cfoot">${done?`<span class="badge done" style="margin:0">✓ ${t("done")}</span><button class="btn" id="studyBtn">${t("unmark")}</button>`:`<button class="btn primary" id="studyBtn">${t("mark")}</button>`}</div>`;
+   <div class="cfoot">${done?`<span class="badge done" style="margin:0">✓ ${t("done")}</span><button class="btn" id="studyBtn">${t("unmark")}</button>`:`<button class="btn primary" id="studyBtn">${t("mark")}</button>`}<button class="btn fbbtn" id="fbBtn">${ft("btn")}</button></div>`;
   card.scrollTop=top;openSheet();
   card.querySelectorAll(".art.ph").forEach(b=>b.onclick=()=>lightbox(b.dataset.code,(b.closest(".item")||b).querySelector("b").textContent));
+  $("#fbBtn").onclick=()=>feedback(c);
   const b=$("#studyBtn");if(b)b.onclick=async()=>{if(studied.has(c))studied.delete(c);else studied.add(c);await save();$("#cnt").textContent=studied.size;paint();openCard(c,true)};
   layoutLabels();
 }
@@ -554,6 +559,21 @@ function openSheet(){if(innerWidth>820)return;panel.classList.remove("closed");i
       else{const cur=panel.getBoundingClientRect().height;document.documentElement.style.setProperty("--sh",cur<innerHeight*0.6?"88%":"42%")}}
     else if(panel.getBoundingClientRect().height<110)panel.classList.add("closed")});
 })();
+
+/* ---------- feedback ---------- */
+const FB_MAIL="alexbulejakarta@gmail.com";
+const FT={btn:["✉️ Feedback","✉️ Masukan"],title:["Send feedback","Kirim masukan"],
+ text:["Spotted a mistake, have a photo to share, or just want to say thanks? Write to me, I read everything.","Ada yang salah, punya foto untuk dibagikan, atau sekadar ingin bilang terima kasih? Tulis saja, semua saya baca."],
+ open:["Open email","Buka email"],copy:["Copy address","Salin alamat"],copied:["Address copied","Alamat disalin"],about:["About","Tentang"]};
+const ft=k=>tr(FT[k]);
+function feedback(c){const subj=`Peta Indonesia${c?": "+PN2(c):""}`;const body=LANG==="id"?(c?`Provinsi: ${PN2(c)}\n\n`:"")+"Halo,\n\n":(c?`Province: ${PN2(c)}\n\n`:"")+"Hi,\n\n";
+  const href=`mailto:${FB_MAIL}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  const m=modal(`<div class="khead"><h2>${ft("title")}</h2><button class="kx" id="fbx">✕</button></div><p class="msub">${ft("text")}</p>
+   <div class="fbmail">${FB_MAIL}</div><a class="btn primary big fbopen" href="${href}">${ft("open")}</a><button class="btn big" id="fbcopy">${ft("copy")}</button><p id="fbmsg" class="okmsg"></p>`);
+  $("#fbx").onclick=closeModal;
+  $("#fbcopy").onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(FB_MAIL);ok=true}catch(e){}
+    if(!ok){const r=document.createRange();r.selectNodeContents($(".fbmail"));const s=getSelection();s.removeAllRanges();s.addRange(r);try{ok=document.execCommand("copy")}catch(e){}}
+    $("#fbmsg").textContent=ok?ft("copied"):FB_MAIL}}
 
 /* ---------- header, language, players ---------- */
 function renderChrome(){
@@ -603,8 +623,8 @@ function profile(){
    <div class="pgroups">${byG.map(([g,n,a])=>`<div style="--gc:var(${GCOL[g]})"><span>${tr(GRN[g])}</span><b>${n}/${a}</b><i style="width:${Math.round(n/a*100)}%"></i></div>`).join("")}</div>
    <div class="lbl">${pt("quiz")}</div>
    <div class="kstats p4"><div><b>${qa}</b><span>${pt("answered")}</span></div><div><b>${qc}</b><span>${pt("correct")}</span></div><div><b>${acc}%</b><span>${pt("acc")}</span></div>
-     <div><b>${pl.kuisCards}</b><span>${pt("cleared")}</span></div><div><b>${pl.kuisGames}</b><span>${pt("played")}</span></div><div><b>${chilis(pl.streak)}</b><span>${pt("streakNow")} · ${pt("bestS")} ${pl.best}</span></div></div>
-   <button class="btn primary big" id="pquiz">🎯 ${pt("playQuiz")}</button>
+     <div><b>${pl.kuisCards}</b><span>${pt("cleared")}</span></div><div><b>${pl.kuisGames}</b><span>${pt("played")}</span></div><div><b>🌶️ ${pl.best||0}</b><span>${kt("bestRun")}</span></div></div>
+   <button class="btn primary big" id="pquiz">🎯 ${pt("playQuiz")}</button><button class="btn big" id="pfb">${ft("btn")}</button>
    <details class="kmove"><summary>${pt("rename")}</summary><div class="row2"><input id="prn" maxlength="24" value="${STORE.cur==="_"?"":esc(STORE.cur)}" placeholder="${t("player")}"><button class="btn primary" id="prsave">${pt("save")}</button></div></details>
    <details class="kmove"><summary>${t("switchP")}</summary>
      ${names.length?`<div class="lbl">${pt("others")}</div><div class="plist">${names.map(n=>`<button class="opt" data-n="${esc(n)}">${n==="_"?t("player"):esc(n)} <small>✓ ${STORE.players[n].studied.length} · 🎯 ${STORE.players[n].kuisCards}</small></button>`).join("")}</div>`:""}
@@ -612,7 +632,7 @@ function profile(){
   m.querySelectorAll(".plist .opt").forEach(b=>b.onclick=async()=>{STORE.cur=b.dataset.n;studied=new Set(P().studied);await save();closeModal();renderChrome();profile()});
   $("#padd").onclick=async()=>{const n=$("#pname").value.trim();if(!n)return;STORE.players[n]=STORE.players[n]||blankPlayer();STORE.cur=n;studied=new Set(P().studied);await save();closeModal();renderChrome();profile()};
   $("#prsave").onclick=async()=>{const n=$("#prn").value.trim();if(!n||n===STORE.cur||STORE.players[n])return;STORE.players[n]=STORE.players[STORE.cur];delete STORE.players[STORE.cur];STORE.cur=n;await save();renderChrome();profile()};
-  $("#pclose").onclick=closeModal;$("#pquiz").onclick=()=>{closeModal();kuisHub()};
+  $("#pclose").onclick=closeModal;$("#pquiz").onclick=()=>{closeModal();kuisHub()};$("#pfb").onclick=()=>feedback();
 }
 $("#pbtn").onclick=profile;
 
@@ -622,8 +642,8 @@ const RX={ok:[["Nice!","Nailed it!","Keep going!","Spot on!"],["Mantap!","Sikat!
 const KT={
  hub:["Quiz","Kuis"],play:["Play a card","Main satu kartu"],again:["Again!","Lagi!"],back:["Back to the map","Kembali ke peta"],
  rank:["Your rank","Pangkatmu"],toNext:["{n} more {cards} to {r}","tinggal {n} kartu lagi ke {r}"],maxRank:["Top rank reached!","Pangkat tertinggi!"],
- ladder:["Rank ladder","Tangga pangkat"],pedas:["Spice level","Level pedas"],best:["best","rekor"],cards:["cards cleared","kartu lolos"],games:["cards played","kartu dimainkan"],
- rules:["A card = 5 questions about 5 different provinces. 10 seconds per question (12 for population, 15 for history and facts). The card counts only if all 5 are right.","Satu kartu = 5 soal tentang 5 provinsi berbeda. 10 detik per soal (12 untuk jumlah penduduk, 15 untuk sejarah dan fakta). Kartu dihitung hanya jika kelimanya benar."],
+ ladder:["Rank ladder","Tangga pangkat"],pedas:["Spice level","Level pedas"],bestRun:["record: correct answers in a row","rekor jawaban benar berturut-turut"],best:["best","rekor"],cards:["cards cleared","kartu lolos"],games:["cards played","kartu dimainkan"],
+ rules:["A card = 5 questions about 5 different provinces, 20 seconds each. The card counts only if all 5 are right.","Satu kartu = 5 soal tentang 5 provinsi berbeda, 20 detik per soal. Kartu dihitung hanya jika kelimanya benar."],
  move:["Move progress to another device","Pindahkan progres ke perangkat lain"],copy:["Copy code","Salin kode"],paste:["Paste code","Tempel kode"],
  copied:["Code copied","Kode disalin"],copyManual:["Copy this code by hand:","Salin kode ini secara manual:"],pasteHere:["Paste the code here","Tempel kode di sini"],
  apply:["Load","Muat"],bad:["This code doesn't work. Check that you copied all of it, starting with IQ1:","Kode ini tidak bisa dipakai. Pastikan kamu menyalin semuanya, dimulai dengan IQ1:"],loaded:["Progress loaded","Progres dimuat"],
@@ -742,7 +762,7 @@ function kuisHub(){KQ.open=true;clearInterval(KQ.timer);const pl=P();const ri=ra
   const m=kmodal(`<div class="khead"><h2>🎯 ${kt("hub")}</h2><button class="kx" id="kx" aria-label="${t("close")}">✕</button></div>
    <div class="krank"><small>${kt("rank")} · ${esc(pname())}</small><b>${rankName(ri)}</b>
      <div class="rb big"><i style="width:${pct}%"></i></div><span>${nx?kt("toNext",{n:nx[0]-pl.kuisCards,r:rankName(ri+1),cards:(nx[0]-pl.kuisCards)===1?"card":"cards"}):kt("maxRank")}</span></div>
-   <div class="kstats"><div><b>${pl.kuisCards}</b><span>${kt("cards")}</span></div><div><b>${pl.kuisGames}</b><span>${kt("games")}</span></div><div><b>${chilis(pl.streak)}</b><span>${kt("pedas")} · ${kt("best")} ${pl.best}</span></div></div>
+   <div class="kstats"><div><b>${pl.kuisCards}</b><span>${kt("cards")}</span></div><div><b>${pl.kuisGames}</b><span>${kt("games")}</span></div><div><b>🌶️ ${pl.best||0}</b><span>${kt("bestRun")}</span></div></div>
    <p class="krules">${kt("rules")}</p>
    <button class="btn primary big" id="kplay">${kt("play")}</button>
    <details class="kladder"><summary>${kt("ladder")}</summary><ol>${RANKS.map((r,i)=>`<li class="${i===ri?"cur":i<ri?"past":""}"><b>${r[0]}</b> ${rankName(i)}</li>`).join("")}</ol></details>
@@ -756,9 +776,9 @@ function kuisHub(){KQ.open=true;clearInterval(KQ.timer);const pl=P();const ri=ra
       if(typeof o.c!=="number"||typeof o.g!=="number")throw 0;pl.kuisCards=Math.max(0,o.c|0);pl.kuisGames=Math.max(0,o.g|0);if(Array.isArray(o.s)){studied=new Set(o.s.filter(x=>byCode[x]))}
       await save();toast(kt("loaded"));renderChrome()}catch(e){$("#kerr").textContent=kt("bad")}}};
 }
-function startCard(){const qs=makeCard();if(!qs)return;const pl=P();pl.kuisGames++;save();KQ.card={qs,i:0};showQ()}
-function showQ(){const st=KQ.card,q=st.qs[st.i],pl=P();const time=q.time||({hist:15,fact:15}[q.type]||10);let left=time;
-  const m=kmodal(`<div class="khead"><span class="kprog">${kt("q")} ${st.i+1}/${NQ}</span><span class="kpedas">${chilis(pl.streak)}</span><button class="kx" id="kx">✕</button></div>
+function startCard(){const qs=makeCard();if(!qs)return;const pl=P();pl.kuisGames++;save();KQ.card={qs,i:0,ok:0};showQ()}
+function showQ(){const st=KQ.card,q=st.qs[st.i],pl=P();const time=20;let left=time;
+  const m=kmodal(`<div class="khead"><span class="kprog">${kt("q")} ${st.i+1}/${NQ}</span><span class="kpedas" title="${kt("pedas")}">${st.ok?"🌶️".repeat(st.ok):"🌶️"}<small>${st.ok}/${NQ}</small></span><button class="kx" id="kx">✕</button></div>
    <div class="ktimer"><i id="kbar"></i></div>
    ${q.img?`<div class="kimg"><img src="${q.img}" alt=""${q.pos?` style="object-position:${q.pos}"`:""}></div>`:""}
    <div class="kq">${q.q}</div>${q.quote?`<blockquote class="kquote">“${q.quote}”</blockquote>`:""}
@@ -770,13 +790,13 @@ function showQ(){const st=KQ.card,q=st.qs[st.i],pl=P();const time=q.time||({hist
 }
 async function answer(i){const st=KQ.card,q=st.qs[st.i],pl=P();pl.qA=(pl.qA||0)+1;const btns=[...document.querySelectorAll(".kopts .opt")];btns.forEach(b=>b.disabled=true);
   const ri=q.opts.findIndex(o=>o.ok);btns[ri].classList.add("right");
-  if(i===ri){btns[i].classList.add("right");pl.qC=(pl.qC||0)+1;if(st.i<NQ-1)save();
-    if(st.i<NQ-1){$("#kres").innerHTML=`<div class="kreact ok">${pick(tr(RX.ok))}</div>`;setTimeout(()=>{st.i++;showQ()},800);return}
-    const before=rankIdx(pl.kuisCards);pl.kuisCards++;pl.streak++;pl.best=Math.max(pl.best,pl.streak);await save();
-    $("#kres").innerHTML=`<div class="kreact ok">${pick(tr(RX.card))}</div><p class="kexp">${q.exp}</p><button class="btn primary big" id="kagain">${kt("again")}</button><button class="btn" id="khub">${kt("hub")}</button>`;
+  if(i===ri){btns[i].classList.add("right");pl.qC=(pl.qC||0)+1;st.ok++;pl.run=(pl.run||0)+1;pl.best=Math.max(pl.best||0,pl.run);if(st.i<NQ-1)save();
+    if(st.i<NQ-1){document.querySelector(".kpedas").innerHTML="🌶️".repeat(st.ok)+`<small>${st.ok}/${NQ}</small>`;$("#kres").innerHTML=`<div class="kreact ok">${pick(tr(RX.ok))} ${"🌶️".repeat(st.ok)}</div>`;setTimeout(()=>{st.i++;showQ()},800);return}
+    const before=rankIdx(pl.kuisCards);pl.kuisCards++;await save();document.querySelector(".kpedas").innerHTML="🌶️".repeat(st.ok)+`<small>${st.ok}/${NQ}</small>`;
+    $("#kres").innerHTML=`<div class="kreact ok">${pick(tr(RX.card))} ${"🌶️".repeat(NQ)}</div><p class="kexp">${q.exp}</p><button class="btn primary big" id="kagain">${kt("again")}</button><button class="btn" id="khub">${kt("hub")}</button>`;
     const after=rankIdx(pl.kuisCards);if(after>before)toast(kt("rankUp",{r:rankName(after)}));
-  }else{if(i>=0)btns[i].classList.add("wrong");pl.streak=0;await save();
-    $("#kres").innerHTML=`<div class="kreact bad">${pick(tr(i<0?RX.time:RX.bad))}</div><p class="kexp"><b>${kt("rightIs")}</b> ${q.opts[ri].t}<br>${q.exp}</p><button class="btn primary big" id="kagain">${kt("again")}</button><button class="btn" id="khub">${kt("hub")}</button>`}
+  }else{if(i>=0)btns[i].classList.add("wrong");pl.run=0;await save();
+    $("#kres").innerHTML=`<div class="kreact bad">${pick(tr(i<0?RX.time:RX.bad))}</div><div class="kpd">${kt("pedas")}: ${st.ok?"🌶️".repeat(st.ok):"0"} ${st.ok}/${NQ}</div><p class="kexp"><b>${kt("rightIs")}</b> ${q.opts[ri].t}<br>${q.exp}</p><button class="btn primary big" id="kagain">${kt("again")}</button><button class="btn" id="khub">${kt("hub")}</button>`}
   $("#kagain").onclick=startCard;$("#khub").onclick=kuisHub;
 }
 $("#kuisBtn").onclick=kuisHub;
