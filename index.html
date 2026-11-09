@@ -263,13 +263,23 @@ h3.first{margin-top:0}
 .fbbtn{margin-left:auto}
 .fbmail{font-size:17px;font-weight:700;padding:12px;border-radius:12px;background:var(--chip);text-align:center;user-select:all;word-break:break-all}
 a.btn.fbopen{display:block;text-align:center;text-decoration:none;box-sizing:border-box}
+.indob{display:flex;flex-direction:column;align-items:center;line-height:1.1;border-color:#E2A33A;background:color-mix(in srgb,#E2A33A 14%,var(--panel))}.indob small{font-size:10.5px;color:var(--soft)}
+.irules{background:var(--chip);border-radius:12px;padding:12px;font-size:14px;line-height:1.45;margin-bottom:6px}
+.isec{font-size:13px;font-weight:800;color:var(--soft);text-align:right;margin:-8px 0 6px}
+.ires{text-align:center;background:var(--panel);border:3px solid var(--ink);border-radius:18px;padding:16px 12px}
+.ihead{font-size:15px;font-weight:800;letter-spacing:.3px}.iteam{font-size:24px;font-weight:900;margin:6px 0 2px;word-break:break-word}
+.iscore b{font-size:56px;font-weight:900;line-height:1}.iscore span{font-size:22px;font-weight:800;color:var(--soft);margin-left:4px}
+.ipct{font-size:16px;font-weight:700;margin-top:2px}.ititle{display:inline-block;margin:10px 0 8px;padding:6px 14px;border-radius:999px;background:var(--ink);color:var(--page);font-weight:800;font-size:16px}
+.itypes{display:flex;flex-wrap:wrap;justify-content:center;gap:5px 8px;font-size:12.5px}.itypes span{background:var(--chip);border-radius:8px;padding:3px 7px}
+.idate{font-size:11.5px;color:var(--soft);margin-top:10px}
+.indob small:empty{display:none}.ihist{margin:8px 0 0;padding-left:20px;font-size:13.5px}.ihist li{padding:5px 0;cursor:pointer}.ihist small{color:var(--soft)}
 </style>
 </head>
 <body>
 <header>
   <h1 id="htitle">Indonesia by Province</h1>
   <div class="brand">by AlexJakarta</div>
-  <div class="hbtns"><button class="btn" id="kuisBtn">🎯 Kuis</button><button class="btn" id="pbtn">👤</button><button class="btn" id="langBtn">EN</button></div>
+  <div class="hbtns"><button class="btn" id="kuisBtn">🎯 Kuis</button><button class="btn indob" id="indoBtn">🏆 Kuis Indodana<small></small></button><button class="btn" id="pbtn">👤</button><button class="btn" id="langBtn">EN</button></div>
   <div class="count"><span id="lblStudied">Studied</span> <b id="cnt">0</b> <span id="lblOf">of 38</span> <button class="btn" id="reset">Reset</button></div>
 </header>
 <nav class="tabs" role="tablist" id="tabs"></nav>
@@ -300,8 +310,9 @@ const GROUPS=["Sumatra","Java","Lesser Sunda Islands","Kalimantan","Sulawesi","M
 const GCOL={"Sumatra":"--g1","Java":"--g2","Kalimantan":"--g3","Sulawesi":"--g4","Lesser Sunda Islands":"--g5","Maluku Islands":"--g6","Papua":"--g7"};
 const GRN={"Sumatra":["Sumatra","Sumatra"],"Java":["Java","Jawa"],"Lesser Sunda Islands":["Lesser Sunda Islands","Nusa Tenggara"],"Kalimantan":["Kalimantan","Kalimantan"],"Sulawesi":["Sulawesi","Sulawesi"],"Maluku Islands":["Maluku Islands","Kepulauan Maluku"],"Papua":["Papua","Papua"]};
 const TZ={WIB:["UTC+7","--tz1"],WITA:["UTC+8","--tz2"],WIT:["UTC+9","--tz3"]};
-const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const pick=a=>a[Math.floor(Math.random()*a.length)];
+let RND=Math.random;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(RND()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(RND()*a.length)];
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 
 /* ---------- language ---------- */
@@ -707,19 +718,19 @@ const G={
    if(ws.length<3)return null;const ph=DATA.ph[code];
    return {type:"place",c,q:kt("whereIs"),img:ph.src,pos:ph.pos,opts:opt4(`${tr(s.n)} (${shortP(c)})`,ws),exp:`${tr(s.n)}, ${PN2(c)}. ${tr(s.d)} (${credit(ph,true)})`,obj:code}},
  cap(used){const cand=CODES.filter(c=>!used.has(c)&&!capSkip(c));if(!cand.length)return null;const c=pick(cand);const p=byCode[c];const nb=neigh(c,3);
-   if(Math.random()<0.5)return {type:"cap",c,q:kt("capOf",{p:PN(p)}),opts:opt4(tr(p.capn),nb.map(x=>tr(byCode[x].capn))),exp:`${tr(p.capn)}: ${LANG==="id"?"ibu kota":"capital of"} ${PN(p)}.`};
+   if(RND()<0.5)return {type:"cap",c,q:kt("capOf",{p:PN(p)}),opts:opt4(tr(p.capn),nb.map(x=>tr(byCode[x].capn))),exp:`${tr(p.capn)}: ${LANG==="id"?"ibu kota":"capital of"} ${PN(p)}.`};
    return {type:"cap",c,q:kt("capWhich",{c:tr(p.capn)}),opts:opt4(PN(p),nb.map(PN2)),exp:`${tr(p.capn)}: ${LANG==="id"?"ibu kota":"capital of"} ${PN(p)}.`}},
  city(used,card){const withPh=CODES.filter(c=>DATA.ph[c+"-C1"]&&!NOQ.has(c+"-C1"));const cand=withPh.filter(c=>!used.has(c));if(!cand.length)return null;const c=pick(cand);
    const ws=nearest(c,withPh,3).map(x=>tr(byCode[x].capn));const ph=DATA.ph[c+"-C1"];const pl=cityPlace(c);
    return {type:"city",c,q:kt("cityPhoto"),img:ph.src,pos:ph.pos,opts:opt4(tr(byCode[c].capn),ws),exp:`${kt("obj")}: ${pl?pl+", ":""}${tr(byCode[c].capn)}, ${PN2(c)} (${credit(ph,true)})`,obj:c+"-C1"}},
  pop(used){const cand=CODES.filter(c=>!used.has(c));const c=pick(cand);const p=byCode[c];
-   for(let tries=0;tries<20;tries++){const below=[0.65,0.5,0.325,0.25],above=[1.5,2,3,4];const kpos=Math.floor(Math.random()*4);
+   for(let tries=0;tries<20;tries++){const below=[0.65,0.5,0.325,0.25],above=[1.5,2,3,4];const kpos=Math.floor(RND()*4);
      const ms=[...below.slice(0,kpos),...above.slice(0,3-kpos)];const vals=[popFmt(p.pop),...ms.map(m=>popFmt(p.pop*m))];
      const nums=vals.map(v=>v[0]).sort((a,b)=>a-b);let okk=true;for(let i=1;i<nums.length;i++)if(nums[i]/nums[i-1]<1.25)okk=false;
      if(!okk)continue;const right=vals[0][1];const sorted=[...vals].sort((a,b)=>a[0]-b[0]);
      return {type:"pop",c,q:kt("popQ",{p:PN(p)}),opts:sorted.map(v=>({t:v[1],ok:v[1]===right})),exp:`${PN(p)}: ${fmtM(p.pop)} (BPS 2025)`,time:12,rightPos:sorted.findIndex(v=>v[1]===right)}}
    return null},
- area(used){for(let tries=0;tries<40;tries++){const c=pick(CODES.filter(x=>!used.has(x)));const n=Math.random()<0.5?3:4;
+ area(used){for(let tries=0;tries<40;tries++){const c=pick(CODES.filter(x=>!used.has(x)));const n=RND()<0.5?3:4;
      const grp=[c,...neigh(c,n-1)].filter(x=>!used.has(x)||x===c);if(grp.length<n)continue;const ar=grp.map(x=>byCode[x].area).sort((a,b)=>b-a);
      if(ar[0]/ar[1]<1.25||ar[0]/ar[ar.length-1]>25)continue;const big=grp.find(x=>byCode[x].area===ar[0]);
      return {type:"area",c:big,all:grp,q:kt("areaQ"),opts:shuffle(grp.map(x=>({t:PN2(x),ok:x===big}))),exp:grp.map(x=>`${PN2(x)}: ${nfmt(Math.round(byCode[x].area))} km²`).join(" · ")}}
@@ -729,7 +740,7 @@ const G={
    let pool=[];for(const x of CODES){if(x===c)continue;DATA.c[x].f.forEach(y=>{if((FOODCAT[y.n]||"other")===cat&&y.n!==f.n)pool.push([x,y])})}
    const ws=[];const up=new Set([c]);for(const [x,y] of shuffle(pool)){if(ws.length===3)break;if(up.has(x))continue;up.add(x);ws.push(`${y.n} (${shortP(x)})`)}
    if(ws.length<3){for(const x of shuffle(CODES)){if(ws.length===3)break;if(up.has(x))continue;up.add(x);ws.push(`${DATA.c[x].f[0].n} (${shortP(x)})`)}}
-   const ph=DATA.ph[code];return {type:"food",c,q:kt("foodQ"),img:ph.src,opts:opt4(`${f.n} (${shortP(c)})`,ws),exp:`${f.n}, ${PN2(c)}: ${tr(f.d)} (${t("ai")})`}},
+   const ph=DATA.ph[code];return {type:"food",c,obj:code,q:kt("foodQ"),img:ph.src,opts:opt4(`${f.n} (${shortP(c)})`,ws),exp:`${f.n}, ${PN2(c)}: ${tr(f.d)} (${t("ai")})`}},
  hist(used){const cand=[];for(const c of CODES){if(used.has(c))continue;DATA.h2[c][1].forEach(([y,s])=>{const m=qmask(tr(s),c);if(maskOk(m))cand.push([c,y,s,m,0])});
      histSent(c).forEach(s=>{const m=qmask(s,c);if(maskOk(m))cand.push([c,null,s,m,1])})}
    if(!cand.length)return null;const [c,y,s,m,para]=pick(cand);const ws=safeWrong(tr(s),c,3);
@@ -745,7 +756,7 @@ const G={
 const NQ=5;
 function makeCard(){
   for(let attempt=0;attempt<30;attempt++){
-    const used=new Set(),qs=[];const first=pick(["place","city"]);const order=[first,...shuffle(["place","cap","city","kota","pop","area","food","hist","fact"].filter(x=>x!==first))];
+    const used=new Set(),qs=[];const first=pick(["place","city"]);let rest=shuffle(["place","cap","city","kota","pop","area","food","hist","fact"].filter(x=>x!==first));if(RND()<0.7)rest=rest.filter(x=>x!=="pop").concat(["pop"]);const order=[first,...rest];
     for(const ty of order){if(qs.length===NQ)break;if(qs.some(q=>q.type===ty))continue;if(ty==="food"&&qs.some(q=>q.type==="food"))continue;
       const q=G[ty](used,qs);if(!q)continue;
       if(qs.some(x=>x.obj&&q.obj&&x.obj===q.obj))continue;
@@ -800,10 +811,94 @@ async function answer(i){const st=KQ.card,q=st.qs[st.i],pl=P();pl.qA=(pl.qA||0)+
   $("#kagain").onclick=startCard;$("#khub").onclick=kuisHub;
 }
 $("#kuisBtn").onclick=kuisHub;
+
+/* ======================= KUIS INDODANA (team tournament) ======================= */
+const INDODANA_MIX={place:14,food:14,cap:10,city:10,kota:10,hist:10,area:10,fact:9,pop:3};
+const INDODANA_SEED=20261109, INDODANA_SECS=20, INDODANA_UNTIL="", INDODANA_CARDS=30, INDODANA_NO="#1";
+const IKEY="indodana-v1";
+const ITYPE={place:"Tempat wisata",cap:"Ibu kota",city:"Foto kota",kota:"Kota",pop:"Penduduk",area:"Luas",food:"Makanan",hist:"Sejarah",fact:"Fakta"};
+const ITITLES=[[0,"Turis Nyasar"],[20,"Anak Kos"],[40,"Ojol Bintang Lima"],[55,"Pemandu Wisata"],[70,"Google Maps Berjalan"],[85,"Suhu Nusantara"]];
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+let ISET=null,ISIG="";
+function isig(set){let h=2166136261;const s=set.map(q=>q.type+q.c+q.q+q.quote+q.opts.map(o=>o.t).join("|")).join("#");for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
+function qkey(q){return q.type==="area"?"area:"+q.c:q.type+":"+(q.obj||q.quote||q.q)}
+function buildIndodana(){
+  const L0=LANG,R0=RND;LANG="id";RND=mulberry32(INDODANA_SEED);
+  try{
+    const types=Object.keys(ITYPE);let pool=[];types.forEach(ty=>{for(let i=0;i<10;i++)pool.push(ty)});
+    const left=Object.assign({},INDODANA_MIX);const cardsT=[];
+    for(let i=0;i<INDODANA_CARDS;i++){const order=shuffle(types).sort((x,y)=>left[y]-left[x]);const tri=shuffle(order.slice(0,3));tri.forEach(ty=>left[ty]--);cardsT.push(tri)}
+    const seen=new Set(),out=[];
+    for(const tri of cardsT){const used=new Set();const card=[];
+      for(let ty of tri){let q=null;
+        for(let tries=0;tries<60&&!q;tries++){const c=G[ty](used,card);if(!c)break;const ps=c.all||[c.c];if(ps.some(x=>used.has(x))||seen.has(qkey(c)))continue;q=c}
+        if(!q){for(const alt of types){if(card.some(x=>x.type===alt)||tri.includes(alt))continue;for(let tries=0;tries<40&&!q;tries++){const c=G[alt](used,card);if(!c)break;const ps=c.all||[c.c];if(ps.some(x=>used.has(x))||seen.has(qkey(c)))continue;q=c}if(q)break}}
+        if(!q)continue;(q.all||[q.c]).forEach(x=>used.add(x));seen.add(qkey(q));
+        card.push({type:q.type,c:q.c,all:q.all||null,q:q.q,quote:q.quote||"",img:q.img||"",pos:q.pos||"",opts:q.opts.map(o=>({t:o.t,ok:!!o.ok})),exp:q.exp})}
+      out.push(card)}
+    return out.flat();
+  }finally{LANG=L0;RND=R0}
+}
+let IST=null;
+let IHIST=[];
+async function iload(){let raw=null;try{if(window.storage&&window.storage.get){const r=await window.storage.get(IKEY);if(r&&r.value)raw=r.value}}catch(e){}
+  if(!raw){try{raw=localStorage.getItem(IKEY)}catch(e){}}let o=null;try{o=raw?JSON.parse(raw):null}catch(e){}
+  if(o&&o.cur!==undefined){IST=o.cur;IHIST=o.hist||[]}else{IST=o;IHIST=[]}}
+async function isave(){const v=JSON.stringify({cur:IST,hist:IHIST});try{if(window.storage&&window.storage.set)await window.storage.set(IKEY,v,false)}catch(e){}try{localStorage.setItem(IKEY,v)}catch(e){}}
+function imodal(html){return kmodal(html)}
+const mmss=ms=>{const s=Math.round(ms/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+async function indodana(){if(!ISET){ISET=buildIndodana();ISIG=isig(ISET)}await iload();
+  if(/[?&]indodana-reset/.test(location.search)){IST=null;IHIST=[];await isave();history.replaceState(null,"",location.pathname)}
+  if(IST&&IST.sig!==ISIG&&!IST.done){IST=null;await isave()}KQ.open=true;clearInterval(KQ.timer);
+  if(IST&&IST.done)return iresult();
+  const cont=IST&&!IST.done&&IST.i>0;
+  const m=imodal(`<div class="khead"><h2>🏆 Kuis Indodana ${INDODANA_NO}</h2><button class="kx" id="ix">✕</button></div>
+   ${INDODANA_UNTIL?`<p class="msub">${INDODANA_UNTIL}</p>`:""}
+   <div class="irules"><b>${INDODANA_CARDS} kartu × 3 soal</b>, ${INDODANA_SECS} detik per soal, semua soal dijawab, kirim screenshot hasil ke grup.</div>
+   ${cont?`<div class="krank"><small>Tim</small><b>${esc(IST.team)}</b><span>Soal ${IST.i+1} / ${ISET.length} · skor ${IST.score}</span></div>
+     <button class="btn primary big" id="icont">Lanjutkan</button>`
+   :`<div class="lbl">Nama tim</div><input id="iteam" maxlength="30" placeholder="contoh: Tim Risk Ganteng" autocomplete="off" style="width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--page);color:var(--ink)"><p id="ierr" class="errmsg"></p>
+     <button class="btn primary big" id="istart">Mulai</button>`}`);
+  $("#ix").onclick=kclose;
+  if(cont){$("#icont").onclick=()=>iq()}
+  else $("#istart").onclick=async()=>{const n=$("#iteam").value.trim();if(!n){$("#ierr").textContent="Isi nama tim dulu.";return}
+    IST={team:n.slice(0,30),i:0,score:0,ms:0,byType:{},started:Date.now(),done:false,sig:ISIG};await isave();iq()};
+}
+function iq(){const q=ISET[IST.i];const total=ISET.length;let left=INDODANA_SECS;const card=Math.floor(IST.i/3)+1,inCard=IST.i%3+1;
+  const m=imodal(`<div class="khead"><span class="kprog">Kartu ${card}/${INDODANA_CARDS} · Soal ${inCard}/3</span><span class="kpedas">${IST.score} poin</span><button class="kx" id="ix">✕</button></div>
+   <div class="ktimer"><i id="kbar"></i></div><div class="isec" id="isec">${INDODANA_SECS}</div>
+   ${q.img?`<div class="kimg"><img src="${q.img}" alt=""${q.pos?` style="object-position:${q.pos}"`:""}></div>`:""}
+   <div class="kq">${q.q}</div>${q.quote?`<blockquote class="kquote">“${q.quote}”</blockquote>`:""}
+   <div class="kopts">${q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${o.t}</button>`).join("")}</div><div id="kres"></div>`);
+  $("#ix").onclick=()=>{clearInterval(KQ.timer);IST.ms+=Date.now()-t0;isave();indodana()};
+  const bar=$("#kbar");const t0=Date.now();clearInterval(KQ.timer);
+  KQ.timer=setInterval(()=>{left=INDODANA_SECS-(Date.now()-t0)/1000;bar.style.width=Math.max(0,left/INDODANA_SECS*100)+"%";$("#isec").textContent=Math.max(0,Math.ceil(left));if(left<=0){clearInterval(KQ.timer);ians(-1,t0)}},100);
+  m.querySelectorAll(".kopts .opt").forEach(b=>b.onclick=()=>{clearInterval(KQ.timer);ians(Number(b.dataset.i),t0)});
+}
+async function ians(i,t0){const q=ISET[IST.i];const btns=[...document.querySelectorAll(".kopts .opt")];btns.forEach(b=>b.disabled=true);
+  const ri=q.opts.findIndex(o=>o.ok);btns[ri].classList.add("right");const ok=i===ri;if(!ok&&i>=0)btns[i].classList.add("wrong");
+  IST.ms+=Math.min(Date.now()-t0,INDODANA_SECS*1000);const bt=IST.byType[q.type]||[0,0];bt[1]++;if(ok){bt[0]++;IST.score++}IST.byType[q.type]=bt;IST.i++;
+  if(IST.i>=ISET.length){IST.done=true;IST.finished=Date.now();IHIST.push(JSON.parse(JSON.stringify(IST)))}await isave();
+  $("#kres").innerHTML=`<div class="kreact ${ok?"ok":"bad"}">${ok?"Benar! ✓":i<0?"Waktu habis":"Salah"}</div>${ok?"":`<p class="kexp"><b>Jawaban benar:</b> ${q.opts[ri].t}</p>`}`;
+  setTimeout(()=>{if(IST.done)iresult();else iq()},ok?1500:2000)}
+function iresult(){clearInterval(KQ.timer);const total=ISET?ISET.length:90;const pct=Math.round(IST.score/total*100);let title=ITITLES[0][1];ITITLES.forEach(([p,n])=>{if(pct>=p)title=n});
+  const hm=x=>new Date(x).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});const d=new Date(IST.finished||Date.now());
+  const dt=d.toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"})+" · Mulai "+hm(IST.started)+" · Selesai "+hm(IST.finished||Date.now());
+  const bt=Object.keys(ITYPE).filter(k=>IST.byType[k]).map(k=>`<span>${ITYPE[k]} <b>${IST.byType[k][0]}/${IST.byType[k][1]}</b></span>`).join("");
+  const m=imodal(`<div class="ires"><div class="ihead">🏆 Kuis Indodana ${INDODANA_NO}</div><div class="iteam">${esc(IST.team)}</div>
+   <div class="iscore"><b>${IST.score}</b><span>/ ${total}</span></div><div class="ipct">${pct}% · ⏱ ${mmss(IST.ms)}</div>
+   <div class="ititle">${title}</div><div class="itypes">${bt}</div><div class="idate">${dt} · alexjakarta.github.io/Indonesia-map</div></div>
+   <div class="row2" style="margin-top:12px"><button class="btn" id="iclose">Tutup</button><button class="btn primary" id="inew">Tim baru</button></div>
+   ${IHIST.length>1?`<details class="kmove"><summary>Hasil di perangkat ini (${IHIST.length})</summary><ol class="ihist">${IHIST.slice().reverse().map((h,j)=>`<li data-j="${IHIST.length-1-j}"><b>${esc(h.team)}</b> ${h.score}/${ISET.length} · ⏱ ${mmss(h.ms)} <small>${new Date(h.finished).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small></li>`).join("")}</ol></details>`:""}`);
+  $("#iclose").onclick=kclose;$("#inew").onclick=async()=>{IST=null;await isave();indodana()};
+  m.querySelectorAll(".ihist li").forEach(li=>li.onclick=()=>{IST=JSON.parse(JSON.stringify(IHIST[+li.dataset.j]));iresult()})}
+$("#indoBtn").onclick=indodana;
+{const s=document.querySelector("#indoBtn small");if(s)s.textContent=INDODANA_UNTIL}
+
 if(/[?&]test/.test(location.search)){window.__qm=()=>{const out=[];for(const c of CODES){DATA.h2[c][1].forEach(([y,s])=>{["en","id"].forEach(l=>{const L0=LANG;LANG=l;const m=qmask(tr(s),c);out.push({c,kind:"hist",lang:l,orig:tr(s),masked:m,ok:maskOk(m)});LANG=L0})});
   histSent(c);["en","id"].forEach(l=>{const L0=LANG;LANG=l;histSent(c).forEach(s=>{const m=qmask(s,c);out.push({c,kind:"para",lang:l,orig:s,masked:m,ok:maskOk(m)})});LANG=L0});
   DATA.x[c].facts.forEach(f=>{["en","id"].forEach(l=>{const L0=LANG;LANG=l;const m=qmask(tr(f),c);out.push({c,kind:"fact",lang:l,orig:tr(f),masked:m,ok:maskOk(m)});LANG=L0})})}return out};
-  window.__card=()=>makeCard();window.__leak=leak;window.__setLang=l=>{LANG=l}}
+  window.__card=()=>makeCard();window.__iset=()=>buildIndodana();window.__leak=leak;window.__setLang=l=>{LANG=l}}
 
 /* ---------- start ---------- */
 (async()=>{await load();
